@@ -1667,8 +1667,8 @@ class Model
 		}
 		$results = count($list);
 
-        if (!is_array($values))
-            $values = array($values);
+		if (!is_array($values))
+			$values = array($values);
 
 		if ($results != ($expected = count($values)))
 		{
