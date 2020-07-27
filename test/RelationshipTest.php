@@ -108,11 +108,9 @@ class RelationshipTest extends DatabaseTest
         $this->assertEquals('Yeah Yeah Yeahs',$bill_events[0]->title);
     }
 	
-	/**
-	 * @expectedException ActiveRecord\RelationshipException
-	 */
 	public function test_joins_on_model_via_undeclared_association()
 	{
+		$this->expectException('\ActiveRecord\RelationshipException');
 		$x = JoinBook::first(array('joins' => array('undeclared')));
 	}
 
@@ -357,11 +355,9 @@ class RelationshipTest extends DatabaseTest
 		$this->assert_true($count >= 5);
 	}
 
-	/**
-	 * @expectedException ActiveRecord\HasManyThroughAssociationException
-	 */
 	public function test_has_many_through_no_association()
 	{
+		$this->expectException('\ActiveRecord\HasManyThroughAssociationException');
 		Event::$belongs_to = array(array('host'));
 		Venue::$has_many[1] = array('hosts', 'through' => 'blahhhhhhh');
 
@@ -399,11 +395,9 @@ class RelationshipTest extends DatabaseTest
 		$this->assert_true(count($venue->hostess) > 0);
 	}
 
-	/**
-	 * @expectedException ReflectionException
-	 */
 	public function test_has_many_through_with_invalid_class_name()
 	{
+		$this->expectException('\ReflectionException');
 		Event::$belongs_to = array(array('host'));
 		Venue::$has_one = array(array('invalid_assoc'));
 		Venue::$has_many[1] = array('hosts', 'through' => 'invalid_assoc');
@@ -535,11 +529,9 @@ class RelationshipTest extends DatabaseTest
 		$this->assert_true(count($venue->hosts) > 0);
 	}
 
-	/**
-	 * @expectedException ActiveRecord\RelationshipException
-	 */
 	public function test_throw_error_if_relationship_is_not_a_model()
 	{
+		$this->expectException('\ActiveRecord\RelationshipException');
 		AuthorWithNonModelRelationship::first()->books;
 	}
 
@@ -740,11 +732,9 @@ class RelationshipTest extends DatabaseTest
 		$this->assert_equals($event->id, $event->venue->id);
 	}
 
-	/**
-	 * @expectedException ActiveRecord\RecordNotFound
-	 */
 	public function test_dont_attempt_eager_load_when_record_does_not_exist()
 	{
+		$this->expectException('\ActiveRecord\RecordNotFound');
 		Author::find(999999, array('include' => array('books')));
 	}
 };
