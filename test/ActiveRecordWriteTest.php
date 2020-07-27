@@ -40,7 +40,7 @@ class ActiveRecordWriteTest extends DatabaseTest
 	public function test_save()
 	{
 		$venue = new Venue(array('name' => 'Tito'));
-		$venue->save();
+		$this->assert_true( $venue->save() );
 	}
 
 	public function test_insert()
