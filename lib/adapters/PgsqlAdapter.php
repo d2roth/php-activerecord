@@ -37,8 +37,8 @@ class PgsqlAdapter extends Connection
 		return true;
 	}
 
-    public function get_sequence_name($table, $column_name)
-    {
+	public function get_sequence_name($table, $column_name)
+	{
         $sequence_name = "{$table}_{$column_name}_seq";
 
         if (!empty($this->schema)) {
@@ -46,7 +46,7 @@ class PgsqlAdapter extends Connection
         }
 
         return $sequence_name;
-    }
+	}
 
 	public function next_sequence_value($sequence_name)
 	{
@@ -60,39 +60,37 @@ class PgsqlAdapter extends Connection
 
 	public function query_column_info($table)
 	{
-		$sql = "SELECT
-      		a.attname AS field,
-      		a.attlen,
-      		REPLACE(pg_catalog.format_type(a.atttypid, a.atttypmod), 'character varying', 'varchar') AS type,
-      		a.attnotnull AS not_nullable,
-      		(SELECT 't'
-        	FROM pg_index
-        	WHERE c.oid = pg_index.indrelid
-        	AND a.attnum = ANY (pg_index.indkey)
-        	AND pg_index.indisprimary = 't'
-      		) IS NOT NULL AS pk,      
-      		REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE((SELECT pg_attrdef.adsrc
-        	FROM pg_attrdef
-        	WHERE c.oid = pg_attrdef.adrelid
-        	AND pg_attrdef.adnum=a.attnum
-      		),'::[a-z_ ]+',''),'''$',''),'^''','') AS default
-	  		FROM pg_attribute a
-			JOIN pg_class c ON c.oid = a.attrelid
-			JOIN pg_type t on t.oid = a.atttypid
-			JOIN pg_namespace n ON n.oid = c.relnamespace
-			WHERE n.nspname = ? 
-			AND c.relname = ?
-			AND a.attnum > 0
-			ORDER BY a.attnum
-			";
-
-        $values = explode('.', $table);
-		return parent::query($sql,$values);
+		$sql = <<<SQL
+SELECT
+      a.attname AS field,
+      a.attlen,
+      REPLACE(pg_catalog.format_type(a.atttypid, a.atttypmod), 'character varying', 'varchar') AS type,
+      a.attnotnull AS not_nullable,
+      (SELECT 't'
+        FROM pg_index
+        WHERE c.oid = pg_index.indrelid
+        AND a.attnum = ANY (pg_index.indkey)
+        AND pg_index.indisprimary = 't'
+      ) IS NOT NULL AS pk,      
+      REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE((SELECT pg_attrdef.adsrc
+        FROM pg_attrdef
+        WHERE c.oid = pg_attrdef.adrelid
+        AND pg_attrdef.adnum=a.attnum
+      ),'::[a-z_ ]+',''),'''$',''),'^''','') AS default
+FROM pg_attribute a, pg_class c, pg_type t
+WHERE c.relname = ?
+      AND a.attnum > 0
+      AND a.attrelid = c.oid
+      AND a.atttypid = t.oid
+ORDER BY a.attnum
+SQL;
+		$values = array($table);
+		return $this->query($sql,$values);
 	}
 
 	public function query_for_tables()
 	{
-		return parent::query("SELECT tablename FROM pg_tables WHERE schemaname NOT IN('information_schema','pg_catalog')");
+		return $this->query("SELECT tablename FROM pg_tables WHERE schemaname NOT IN('information_schema','pg_catalog')");
 	}
 
 	public function create_column(&$column)
@@ -141,7 +139,7 @@ class PgsqlAdapter extends Connection
 
 	public function set_encoding($charset)
 	{
-		parent::query("SET NAMES '$charset'");
+		$this->query("SET NAMES '$charset'");
 	}
 
 	public function native_database_types()

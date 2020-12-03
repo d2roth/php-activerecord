@@ -35,7 +35,7 @@ class Table
 	 */
 	public $db_name;
 
-    /**
+	/**
      * Name of the schema, used with postgresql (optional)
      */
     public $schema_name;
@@ -298,7 +298,7 @@ class Table
 			// nested include
 			if (is_array($name))
 			{
-				$nested_includes = count($name) > 0 ? $name : array();
+				$nested_includes = count($name) > 0 ? $name : $name[0];
 				$name = $index;
 			}
 			else
@@ -336,8 +336,8 @@ class Table
 
         else {
 
-            if ($this->db_name)
-                $table = $this->conn->quote_name($this->db_name) . ".$table";
+		if ($this->db_name)
+			$table = $this->conn->quote_name($this->db_name) . ".$table";
         }
 
 		return $table;
@@ -463,8 +463,10 @@ class Table
 					$hash[$name] = $this->conn->date_to_string($value);
 				else
 					$hash[$name] = $this->conn->datetime_to_string($value);
-			}
-			else
+			} elseif ( $value instanceof Model && $this->has_relationship( $name ) ){
+				// If this is a related model then unset it as a property
+				unset( $hash[$name] );
+			} else
 				$hash[$name] = $value;
 		}
 		return $hash;
@@ -506,9 +508,9 @@ class Table
         }
 
         else {
-            if (($db = $this->class->getStaticPropertyValue('db',null)) || ($db = $this->class->getStaticPropertyValue('db_name',null)))
-                $this->db_name = $db;
-        }
+		if (($db = $this->class->getStaticPropertyValue('db',null)) || ($db = $this->class->getStaticPropertyValue('db_name',null)))
+			$this->db_name = $db;
+	}
 
 	}
 

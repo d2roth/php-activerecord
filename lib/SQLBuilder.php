@@ -88,30 +88,16 @@ class SQLBuilder
 		if ($this->data)
 			$ret = array_values($this->data);
 
-		if ($this->get_param_values())
-			$ret = array_merge($ret,$this->get_param_values());
+		if ($this->get_where_values())
+			$ret = array_merge($ret,$this->get_where_values());
 
 		return array_flatten($ret);
 	}
 
-    /**
-     * @deprecated
-     * @see get_param_values
-     * @return array
-     */
 	public function get_where_values()
 	{
-        return $this->get_param_values();
+		return $this->where_values;
 	}
-
-    /**
-     * Return join and where parameters
-     * @return array
-     */
-    public function get_param_values()
-    {
-        return array_merge($this->joins_values, $this->update_values, $this->where_values);
-    }
 
 	public function where(/* (conditions, values) || (hash) */)
 	{
@@ -119,14 +105,14 @@ class SQLBuilder
 		return $this;
 	}
 
-    public function order($order)
-    {
+	public function order($order)
+	{
         $this->order = empty($this->order) ? $order : $this->order.', '.$order;
-        return $this;
-    }
+		return $this;
+	}
 
-    public function group($group)
-    {
+	public function group($group)
+	{
         $this->group = empty($this->group) ? $group : $this->group.', '.$group;
         return $this;
     }
@@ -134,8 +120,8 @@ class SQLBuilder
     public function from($from)
     {
         $this->table = $from;
-        return $this;
-    }
+		return $this;
+	}
 
 	public function having($having)
 	{
@@ -155,13 +141,13 @@ class SQLBuilder
 		return $this;
 	}
 
-    public function select($select)
-    {
-        $this->operation = 'SELECT';
+	public function select($select)
+	{
+		$this->operation = 'SELECT';
         $select = trim($select, ", \t\n");
         $this->select = ($this->select === '*') ? $select : $this->select.', '.$select;
-        return $this;
-    }
+		return $this;
+	}
 
     /**
      * @param $join
@@ -182,7 +168,7 @@ class SQLBuilder
             $values = array_slice($args,1);
 
             foreach ($values as $name => &$value)
-            {
+	{
                 if (is_array($value))
                 {
                     $e = new Expressions($this->connection,$join);
@@ -199,8 +185,8 @@ class SQLBuilder
             $this->joins_values =  array_merge($this->joins_values, $values);
         }
 
-        return $this;
-    }
+		return $this;
+	}
 
 	public function insert($hash, $pk=null, $sequence_name=null)
 	{
@@ -217,8 +203,8 @@ class SQLBuilder
 	}
 
     public function update($set /*, value1, value2, value3 */)
-    {
-        $this->operation = 'UPDATE';
+	{
+		$this->operation = 'UPDATE';
 
         if (is_hash($set)) {
             $this->data = $set;
@@ -236,7 +222,7 @@ class SQLBuilder
 
             if (empty($this->update))
                 $this->update = $set;
-            else
+		else
                 $this->update .= ', ' . $set;
 
         } elseif ($num_args > 1) {
@@ -268,8 +254,8 @@ class SQLBuilder
             $this->update_values = array_merge($this->update_values, $values);
         }
 
-        return $this;
-    }
+		return $this;
+	}
 
 	public function delete()
 	{
@@ -390,40 +376,40 @@ class SQLBuilder
 		return $new;
 	}
 
-    private function apply_where_conditions($args)
-    {
-        require_once 'Expressions.php';
-        $num_args = count($args);
+	private function apply_where_conditions($args)
+	{
+		require_once 'Expressions.php';
+		$num_args = count($args);
 
-        if ($num_args == 1 && is_hash($args[0]))
-        {
-            $hash = is_null($this->joins) ? $args[0] : $this->prepend_table_name_to_fields($args[0]);
-            $e = new Expressions($this->connection,$hash);
-            $this->where = $e->to_s();
-            $this->where_values = array_flatten($e->values());
-        }
-        elseif ($num_args > 0)
-        {
-            // if the values has a nested array then we'll need to use Expressions to expand the bind marker for us
-            $values = array_slice($args,1);
+		if ($num_args == 1 && is_hash($args[0]))
+		{
+			$hash = is_null($this->joins) ? $args[0] : $this->prepend_table_name_to_fields($args[0]);
+			$e = new Expressions($this->connection,$hash);
+			$this->where = $e->to_s();
+			$this->where_values = array_flatten($e->values());
+		}
+		elseif ($num_args > 0)
+		{
+			// if the values has a nested array then we'll need to use Expressions to expand the bind marker for us
+			$values = array_slice($args,1);
 
-            foreach ($values as $name => &$value)
-            {
-                if (is_array($value))
-                {
-                    $e = new Expressions($this->connection,$args[0]);
-                    $e->bind_values($values);
+			foreach ($values as $name => &$value)
+			{
+				if (is_array($value))
+				{
+					$e = new Expressions($this->connection,$args[0]);
+					$e->bind_values($values);
                     $this->where = ( empty($this->where) ? '' : $this->where . ' AND ' ) . $e->to_s();
                     $this->where_values = array_merge($this->where_values, array_flatten($e->values()));
-                    return;
-                }
-            }
+					return;
+				}
+			}
 
-            // no nested array so nothing special to do
+			// no nested array so nothing special to do
             $this->where = ( empty($this->where) ? '' : $this->where . ' AND ' ) . $args[0];
             $this->where_values =  array_merge($this->where_values,$values);
-        }
-    }
+		}
+	}
 
 	private function build_delete()
 	{

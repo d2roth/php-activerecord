@@ -427,8 +427,13 @@ class Model
 
 		foreach (static::$delegate as &$item)
 		{
-			if (($delegated_name = $this->is_delegated($name,$item)))
-				return $this->{$item['to']}->{$delegated_name} = $value;
+			if (($delegated_name = $this->is_delegated($name,$item))){
+				// If there are no existing related models $this->{$item['to']} is null
+				if( null === $this->{$item['to']} )
+					return $this->assign_attribute($item['to'], $this->{"build_" . $item['to']}([$delegated_name => $value]));
+				else
+					return $this->{$item['to']}->$delegated_name = $value;
+			}
 		}
 
 		throw new UndefinedPropertyException(get_called_class(),$name);
@@ -1673,7 +1678,7 @@ class Model
 		if ($results != ($expected = count($values)))
 		{
 			$class = get_called_class();
-			$values = join(',',$values);
+				$values = join(',',$values);
 
 			if ($expected == 1)
 			{
