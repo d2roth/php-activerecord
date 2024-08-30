@@ -45,7 +45,7 @@ class Memcache
 
 	public function write($key, $value, $expire)
 	{
-		$this->memcache->set($key,$value,null,$expire);
+		$this->memcache->set($key,$value,MEMCACHE_COMPRESSED,$expire);
 	}
 
 	public function delete($key)

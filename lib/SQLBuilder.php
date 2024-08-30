@@ -174,7 +174,7 @@ class SQLBuilder
         $num_args = count($args);
 
         if ($num_args == 1) {
-            $this->joins = $this->joins.' '.$join;
+            $this->joins .= ( !empty( $this->joins ) ? " " : "" ) . $join;
         }
 
         elseif ($num_args > 1) {
@@ -188,14 +188,14 @@ class SQLBuilder
                     $e = new Expressions($this->connection,$join);
                     $e->bind_values($values);
 
-                    $this->joins = $this->joins.' '.$e->to_s();
+                    $this->joins .= ( !empty( $this->joins ) ? " " : "" ) . $e->to_s();
                     $this->joins_values = array_merge($this->joins_values, array_flatten($e->values()));
                     return;
                 }
             }
 
             // no nested array so nothing special to do
-            $this->joins = $this->joins.' '.$join;
+            $this->joins .= ( !empty( $this->joins ) ? " " : "" ) . $join;
             $this->joins_values =  array_merge($this->joins_values, $values);
         }
 
@@ -283,7 +283,8 @@ class SQLBuilder
 	 */
 	public static function reverse_order($order)
 	{
-		if (!trim($order))
+		// Return early if it is a blank value or only blank characters
+		if (!$order || !trim($order))
 			return $order;
 
 		$parts = explode(',',$order);
@@ -489,7 +490,7 @@ class SQLBuilder
 
 	private function build_update()
 	{
-		if (strlen($this->update) > 0)
+		if (strlen($this->update ?? '') > 0)
 			$set = $this->update;
 		else
 			$set = join('=?, ', $this->quoted_key_names()) . '=?';

@@ -8,8 +8,9 @@ class SQLBuilderTest extends DatabaseTest
 	protected $table_name = 'authors';
 	protected $class_name = 'Author';
 	protected $table;
+	public $sql;
 
-	public function set_up($connection_name=null)
+	public function set_up($connection_name=null): void
 	{
 		parent::set_up($connection_name);
 		$this->sql = new SQLBuilder($this->conn,$this->table_name);
@@ -34,7 +35,7 @@ class SQLBuilderTest extends DatabaseTest
 
 	public function test_no_connection()
 	{
-		$this->expectException('\ActiveRecord\ActiveRecordException');
+		$this->expectException('ActiveRecord\ActiveRecordException');
 		new SQLBuilder(null,'authors');
 	}
 
@@ -132,7 +133,7 @@ class SQLBuilderTest extends DatabaseTest
 
 	public function test_insert_requires_hash()
 	{
-		$this->expectException('\ActiveRecord\ActiveRecordException');
+		$this->expectException('ActiveRecord\ActiveRecordException');
 		$this->sql->insert(array(1));
 	}
 

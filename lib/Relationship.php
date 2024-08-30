@@ -131,7 +131,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 		$values = array();
 		$options = $this->options;
 		$inflector = Inflector::instance();
-		$query_key = $query_keys[0];
+		$query_key = $query_keys ? $query_keys[0] : 'id';
 		$model_values_key = $model_values_keys[0];
 
 		foreach ($attributes as $column => $value)
@@ -443,10 +443,12 @@ class HasMany extends AbstractRelationship
 	 */
 	static protected $valid_association_options = array('primary_key', 'order', 'group', 'having', 'limit', 'offset', 'through', 'source');
 
-	protected $primary_key;
-
+	public $initialized = false;
 	private $has_one = false;
 	private $through;
+
+	// Set to public due to no getter defined
+	public $primary_key = array();
 
 	/**
 	 * Constructs a {@link HasMany} relationship.
@@ -491,7 +493,7 @@ class HasMany extends AbstractRelationship
 		// since through relationships depend on other relationships we can't do
 		// this initiailization in the constructor since the other relationship
 		// may not have been created yet and we only want this to run once
-		if (!isset($this->initialized))
+		if (!$this->initialized)
 		{
 			if ($this->through)
 			{
@@ -601,7 +603,7 @@ class HasMany extends AbstractRelationship
 		return $record;
 	}
 
-	public function load_eagerly($models=array(), $attributes=array(), $includes, Table $table)
+	public function load_eagerly($models=array(), $attributes=array(), $includes=array(), Table $table=null)
 	{
 		$this->set_keys($table->class->name);
 		$this->query_and_attach_related_models_eagerly($table,$models,$attributes,$includes,$this->foreign_key, $table->pk);
@@ -685,6 +687,8 @@ class HasAndBelongsToMany extends AbstractRelationship
  */
 class BelongsTo extends AbstractRelationship
 {
+	private $_primary_key = array(); // __get is not called for public properties and class methods can call private attributes so need to preface it to always call the getter
+
 	public function __construct($options=array())
 	{
 		parent::__construct($options);
@@ -699,8 +703,11 @@ class BelongsTo extends AbstractRelationship
 
 	public function __get($name)
 	{
-		if($name === 'primary_key' && !isset($this->primary_key)) {
-			$this->primary_key = array(Table::load($this->class_name)->pk[0]);
+		if($name === 'primary_key') {
+			if( $this->_primary_key === array() ){
+				$this->_primary_key = array(Table::load($this->class_name)->pk[0]);
+			}
+			$name = "_primary_key";
 		}
 
 		return $this->$name;
@@ -723,7 +730,7 @@ class BelongsTo extends AbstractRelationship
 		return $class::first($options);
 	}
 
-	public function load_eagerly($models=array(), $attributes, $includes, Table $table)
+	public function load_eagerly($models=array(), $attributes=array(), $includes=array(), Table $table=null)
 	{
 		$this->query_and_attach_related_models_eagerly($table,$models,$attributes,$includes, $this->primary_key,$this->foreign_key);
 	}

@@ -54,7 +54,7 @@ class ExpressionsTest extends SnakeCase_PHPUnit_Framework_TestCase
 
 	public function test_insufficient_variables()
 	{
-		$this->expectException('\ActiveRecord\ExpressionsException');
+		$this->expectException(ActiveRecord\ExpressionsException::class);
 		$c = new Expressions(null,'name=? and id=?','Tito');
 		$c->to_s();
 	}
@@ -164,7 +164,7 @@ class ExpressionsTest extends SnakeCase_PHPUnit_Framework_TestCase
 
 	public function test_bind_invalid_parameter_number()
 	{
-		$this->expectException('\ActiveRecord\ExpressionsException');
+		$this->expectException(ActiveRecord\ExpressionsException::class);
 		$a = new Expressions(null,'name=?');
 		$a->bind(0,99);
 	}

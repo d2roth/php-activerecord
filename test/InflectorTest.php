@@ -3,6 +3,7 @@ require_once __DIR__ . '/../lib/Inflector.php';
 
 class InflectorTest extends SnakeCase_PHPUnit_Framework_TestCase
 {
+	public $inflector;
 	public function set_up()
 	{
 		$this->inflector = ActiveRecord\Inflector::instance();

@@ -35,7 +35,7 @@ class Table
 	 */
 	public $db_name;
 
-    /**
+	/**
      * Name of the schema, used with postgresql (optional)
      */
     public $schema_name;
@@ -193,7 +193,7 @@ class Table
 				if (is_string($options['conditions']))
 					$options['conditions'] = array($options['conditions']);
 
-				call_user_func_array(array($sql,'where'),$options['conditions']);
+				call_user_func_array(array($sql,'where'),is_array($options['conditions']) ? $options['conditions'] : []);
 			}
 			else
 			{
@@ -463,8 +463,10 @@ class Table
 					$hash[$name] = $this->conn->date_to_string($value);
 				else
 					$hash[$name] = $this->conn->datetime_to_string($value);
-			}
-			else
+			} elseif ( $value instanceof Model && $this->has_relationship( $name ) ){
+				// If this is a related model then unset it as a property
+				unset( $hash[$name] );
+			} else
 				$hash[$name] = $value;
 		}
 		return $hash;
@@ -472,7 +474,7 @@ class Table
 
 	private function set_primary_key()
 	{
-		if (($pk = $this->class->getStaticPropertyValue('pk',null)) || ($pk = $this->class->getStaticPropertyValue('primary_key',null)))
+		if (($pk = $this->class->getStaticPropertyValue('pk',false)) || ($pk = $this->class->getStaticPropertyValue('primary_key',false)))
 			$this->pk = is_array($pk) ? $pk : array($pk);
 		else
 		{
@@ -590,6 +592,10 @@ class Table
 	{
 		$delegates = $this->class->getStaticPropertyValue('delegate',array());
 		$new = array();
+
+		if( empty( $delegates ) ){
+			return;
+		}
 
 		if (!array_key_exists('processed', $delegates))
 			$delegates['processed'] = false;

@@ -3,7 +3,7 @@ require_once __DIR__ . '/../lib/adapters/SqliteAdapter.php';
 
 class SqliteAdapterTest extends AdapterTest
 {
-	public function set_up($connection_name=null)
+	public function set_up($connection_name=null): void
 	{
 		parent::set_up('sqlite');
 	}
@@ -77,6 +77,8 @@ class SqliteAdapterTest extends AdapterTest
 	}
 
 	// not supported
-	public function test_connect_with_port() {}
+	public function test_connect_with_port() {
+		$this->expectNotToPerformAssertions();
+	}
 }
 ?>

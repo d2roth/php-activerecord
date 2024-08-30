@@ -46,6 +46,8 @@ class Validations
 	private $validators = array();
 	private $record;
 
+	public $klass;
+
 	private static $VALIDATION_FUNCTIONS = array(
 		'validates_presence_of',
 		'validates_size_of',
@@ -521,7 +523,7 @@ class Validations
 
 					$message = str_replace('%d', $option, $message);
 					$attribute_value = $this->model->$attribute;
-					$len = strlen($attribute_value);
+					$len = is_null( $attribute_value ) ? 0 : strlen($attribute_value);
 					$value = (int)$attr[$range_option];
 
 					if ('maximum' == $range_option && $len > $value)
@@ -904,7 +906,7 @@ class Errors implements IteratorAggregate
 	 *
 	 * @return ArrayIterator
 	 */
-	public function getIterator()
+	public function getIterator(): \Traversable
 	{
 		return new ArrayIterator($this->full_messages());
 	}

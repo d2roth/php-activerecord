@@ -4,7 +4,7 @@ class ActiveRecordFindTest extends DatabaseTest
 {
 	public function test_find_with_no_params()
 	{
-		$this->expectException('\ActiveRecord\RecordNotFound');
+		$this->expectException(ActiveRecord\RecordNotFound::class);
 		Author::find();
 	}
 
@@ -16,7 +16,7 @@ class ActiveRecordFindTest extends DatabaseTest
 
 	public function test_find_by_pkno_results()
 	{
-		$this->expectException('\ActiveRecord\RecordNotFound');
+		$this->expectException(ActiveRecord\RecordNotFound::class);
 		Author::find(99999999);
 	}
 
@@ -57,7 +57,7 @@ class ActiveRecordFindTest extends DatabaseTest
 
 	public function test_find_nothing_with_sql_in_string()
 	{
-		$this->expectException('\ActiveRecord\RecordNotFound');
+		$this->expectException(ActiveRecord\RecordNotFound::class);
 		Author::first('name = 123123123');
 	}
 
@@ -75,7 +75,7 @@ class ActiveRecordFindTest extends DatabaseTest
 
 	public function test_find_all_with_empty_array_bind_value_throws_exception()
 	{
-		$this->expectException('\ActiveRecord\DatabaseException');
+		$this->expectException(ActiveRecord\DatabaseException::class);
 		$authors = Author::find('all',array('conditions' => array('author_id IN(?)', array())));
 		$this->assertCount(0,$authors);
 	}
@@ -258,7 +258,7 @@ class ActiveRecordFindTest extends DatabaseTest
 
 	public function test_find_by_call_static_invalid_column_name()
 	{
-		$this->expectException('\ActiveRecord\DatabaseException');
+		$this->expectException(ActiveRecord\DatabaseException::class);
 		Author::find_by_sharks();
 	}
 
@@ -288,7 +288,7 @@ class ActiveRecordFindTest extends DatabaseTest
 
 	public function test_find_all_by_call_static_undefined_method()
 	{
-		$this->expectException('\ActiveRecord\ActiveRecordException');
+		$this->expectException(ActiveRecord\ActiveRecordException::class);
 		Author::find_sharks('Tito');
 	}
 
@@ -300,7 +300,7 @@ class ActiveRecordFindTest extends DatabaseTest
 
 	public function test_find_by_call_static_with_invalid_field_name()
 	{
-		$this->expectException('\ActiveRecord\ActiveRecordException');
+		$this->expectException(ActiveRecord\ActiveRecordException::class);
 		Author::find_by_some_invalid_field_name('Tito');
 	}
 
@@ -311,9 +311,9 @@ class ActiveRecordFindTest extends DatabaseTest
 		$this->assert_equals(123,$author->bubba);
 	}
 
-	public function test_find_with_select_non_selected_fields_should_not_have_attributes()
+	public function test_find_with_select_non_selected_fields_should_throw_undefined_property_exception()
 	{
-		$this->expectException('\ActiveRecord\UndefinedPropertyException');
+		$this->expectException(ActiveRecord\UndefinedPropertyException::class);
 		$author = Author::first(array('select' => 'name, 123 as bubba'));
 		$author->id;
 	}
@@ -385,7 +385,7 @@ class ActiveRecordFindTest extends DatabaseTest
 
 	public function test_from_with_invalid_table()
 	{
-		$this->expectException('\ActiveRecord\DatabaseException');
+		$this->expectException(ActiveRecord\DatabaseException::class);
 		$author = Author::find('first', array('from' => 'wrong_authors_table'));
 	}
 
@@ -411,19 +411,19 @@ class ActiveRecordFindTest extends DatabaseTest
 
 	public function test_find_or_create_by_throws_exception_when_using_or()
 	{
-		$this->expectException('\ActiveRecord\ActiveRecordException');
+		$this->expectException(ActiveRecord\ActiveRecordException::class);
 		Author::find_or_create_by_name_or_encrypted_password('New Guy','pencil');
 	}
 
 	public function test_find_by_zero()
 	{
-		$this->expectException('\ActiveRecord\RecordNotFound');
+		$this->expectException(ActiveRecord\RecordNotFound::class);
 		Author::find(0);
 	}
 
 	public function test_find_by_null()
 	{
-		$this->expectException('\ActiveRecord\RecordNotFound');
+		$this->expectException(ActiveRecord\RecordNotFound::class);
 		Author::find(null);
 	}
 

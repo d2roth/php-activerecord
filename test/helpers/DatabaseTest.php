@@ -7,6 +7,10 @@ class DatabaseTest extends SnakeCase_PHPUnit_Framework_TestCase
 	public static $log = false;
 	public static $db;
 
+	private $original_default_connection;
+	private $original_date_class;
+	public $connection_name;
+
 	public function set_up($connection_name=null)
 	{
 		ActiveRecord\Table::clear_cache();
@@ -72,14 +76,14 @@ class DatabaseTest extends SnakeCase_PHPUnit_Framework_TestCase
 	{
 		$needle = str_replace(array('"','`'),'',$needle);
 		$haystack = str_replace(array('"','`'),'',$haystack);
-		return $this->assertStringContainsString($needle, $haystack);
+		$this->assertStringContainsString($needle, $haystack);
 	}
 
 	public function assert_sql_doesnt_has($needle, $haystack)
 	{
 		$needle = str_replace(array('"','`'),'',$needle);
 		$haystack = str_replace(array('"','`'),'',$haystack);
-		return $this->assertStringNotContainsString($needle, $haystack);
+		$this->assertStringNotContainsString($needle, $haystack);
 	}
 }
 ?>

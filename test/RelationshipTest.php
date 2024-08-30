@@ -110,7 +110,7 @@ class RelationshipTest extends DatabaseTest
 	
 	public function test_joins_on_model_via_undeclared_association()
 	{
-		$this->expectException('\ActiveRecord\RelationshipException');
+		$this->expectException('ActiveRecord\RelationshipException');
 		$x = JoinBook::first(array('joins' => array('undeclared')));
 	}
 
@@ -141,7 +141,7 @@ class RelationshipTest extends DatabaseTest
 
 	public function test_belongs_to_returns_null_when_foreign_key_is_null()
 	{
-		$event = Event::create(array('title' => 'venueless event', 'host_id' => ''));
+		$event = Event::create(array('title' => 'venueless event', 'host_id' => 1));
 		$this->assert_null($event->venue);
 	}
 
@@ -269,16 +269,12 @@ class RelationshipTest extends DatabaseTest
 
 	public function test_has_many_with_select()
 	{
+		$this->expectException(ActiveRecord\UndefinedPropertyException::class);
+		$this->expectExceptionMessage('description');
 		Venue::$has_many[0]['select'] = 'title, type';
 		$venue = $this->get_relationship();
 		$this->assert_default_has_many($venue);
-
-		try {
-			$venue->events[0]->description;
-			$this->fail('expected Exception ActiveRecord\UndefinedPropertyException');
-		} catch (ActiveRecord\UndefinedPropertyException $e) {
-			$this->assert_true(strpos($e->getMessage(), 'description') !== false);
-		}
+		$venue->events[0]->description;
 	}
 
 	public function test_has_many_with_readonly()
@@ -357,7 +353,7 @@ class RelationshipTest extends DatabaseTest
 
 	public function test_has_many_through_no_association()
 	{
-		$this->expectException('\ActiveRecord\HasManyThroughAssociationException');
+		$this->expectException('ActiveRecord\HasManyThroughAssociationException');
 		Event::$belongs_to = array(array('host'));
 		Venue::$has_many[1] = array('hosts', 'through' => 'blahhhhhhh');
 
@@ -397,7 +393,7 @@ class RelationshipTest extends DatabaseTest
 
 	public function test_has_many_through_with_invalid_class_name()
 	{
-		$this->expectException('\ReflectionException');
+		$this->expectException('ReflectionException');
 		Event::$belongs_to = array(array('host'));
 		Venue::$has_one = array(array('invalid_assoc'));
 		Venue::$has_many[1] = array('hosts', 'through' => 'invalid_assoc');
@@ -417,6 +413,7 @@ class RelationshipTest extends DatabaseTest
 		Author::$has_many = array(array('explicit_books', 'class_name' => 'Book', 'primary_key' => 'parent_author_id', 'foreign_key' => 'secondary_author_id'));
 		$author = Author::find(4);
 
+		$this->assertIsArray($author->explicit_books);
 		foreach ($author->explicit_books as $book)
 			$this->assert_equals($book->secondary_author_id, $author->parent_author_id);
 
@@ -531,7 +528,7 @@ class RelationshipTest extends DatabaseTest
 
 	public function test_throw_error_if_relationship_is_not_a_model()
 	{
-		$this->expectException('\ActiveRecord\RelationshipException');
+		$this->expectException('ActiveRecord\RelationshipException');
 		AuthorWithNonModelRelationship::first()->books;
 	}
 
@@ -733,7 +730,7 @@ class RelationshipTest extends DatabaseTest
 
 	public function test_dont_attempt_eager_load_when_record_does_not_exist()
 	{
-		$this->expectException('\ActiveRecord\RecordNotFound');
+		$this->expectException('ActiveRecord\RecordNotFound');
 		Author::find(999999, array('include' => array('books')));
 	}
 };

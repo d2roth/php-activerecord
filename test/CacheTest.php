@@ -11,7 +11,7 @@ class CacheTest extends SnakeCase_PHPUnit_Framework_TestCase
 			return;
 		}
 		
-		Cache::initialize('memcache://localhost');
+		Cache::initialize('memcache://127.0.0.1');
 	}
 
 	public function tear_down()
@@ -50,6 +50,9 @@ class CacheTest extends SnakeCase_PHPUnit_Framework_TestCase
 	{
 		$this->cache_get();
 		Cache::get("1337", function() { throw new Exception("I better not execute!"); });
+
+		// Keeps this test from being marked risky
+		$this->addToAssertionCount(1);
 	}
 
 	public function test_cache_adapter_returns_false_on_cache_miss()
@@ -81,8 +84,8 @@ class CacheTest extends SnakeCase_PHPUnit_Framework_TestCase
 
 	public function test_exception_when_connect_fails()
 	{
-		$this->expectException('\ActiveRecord\CacheException');
-		$this->expectExceptionMessage('Connection refused');
+		$this->expectException(ActiveRecord\CacheException::class);
+		$this->expectExceptionMessage("Can't connect");
 		Cache::initialize('memcache://127.0.0.1:1234');
 	}
 }

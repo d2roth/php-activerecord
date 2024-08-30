@@ -2,6 +2,8 @@
 
 class ActiveRecordTest extends DatabaseTest
 {
+	public $options;
+
 	public function set_up($connection_name=null)
 	{
 		parent::set_up($connection_name);
@@ -18,7 +20,7 @@ class ActiveRecordTest extends DatabaseTest
 	}
 
 	public function test_options_hash_with_unknown_keys() {
-		$this->expectException('\ActiveRecord\ActiveRecordException');
+		$this->expectException(ActiveRecord\ActiveRecordException::class);
 		$this->assert_false(Author::is_options_hash(array('conditions' => 'blah', 'sharks' => 'laserz', 'dubya' => 'bush')));
 	}
 
@@ -57,7 +59,7 @@ class ActiveRecordTest extends DatabaseTest
 
 	public function test_invalid_attribute()
 	{
-		$this->expectException('\ActiveRecord\UndefinedPropertyException');
+		$this->expectException(ActiveRecord\UndefinedPropertyException::class);
 		$author = Author::find('first',array('conditions' => 'author_id=1'));
 		$author->some_invalid_field_name;
 	}
@@ -480,7 +482,7 @@ class ActiveRecordTest extends DatabaseTest
 
 	public function test_undefined_instance_method()
 	{
-		$this->expectException('\ActiveRecord\ActiveRecordException');
+		$this->expectException(ActiveRecord\ActiveRecordException::class);
 		Author::first()->find_by_name('sdf');
 	}
 

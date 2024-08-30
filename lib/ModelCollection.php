@@ -59,12 +59,12 @@ class ModelCollection extends \ArrayObject {
      * @param $index
      * @param Model $model	Allow only Model objects
      */
-    public function offsetSet($index, $model)
+    public function offsetSet(mixed $index, mixed $model): void
     {
         if (!$model instanceof Model)
             throw new  \RuntimeException('$model must be object Model instance');
 
-        return parent::offsetSet($index, $model);
+        parent::offsetSet($index, $model);
     }
 
     /**

@@ -2,6 +2,9 @@
 
 class ModelCallbackTest extends DatabaseTest
 {
+	public $venue;
+	public $callback;
+	
 	public function set_up($connection_name=null)
 	{
 		parent::set_up($connection_name);

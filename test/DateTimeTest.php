@@ -4,6 +4,9 @@ use ActiveRecord\DateTime as DateTime;
 
 class DateTimeTest extends SnakeCase_PHPUnit_Framework_TestCase
 {
+	public $date = null;
+	public $original_format = null;
+	
 	public function set_up()
 	{
 		$this->date = new DateTime();
@@ -170,7 +173,7 @@ class DateTimeTest extends SnakeCase_PHPUnit_Framework_TestCase
 
 	public function test_native_date_time_attribute_copies_exact_tz()
 	{
-		$dt = new \DateTime(null, new \DateTimeZone('America/New_York'));
+		$dt = new \DateTime("now", new \DateTimeZone('America/New_York'));
 		$model = $this->get_model();
 
 		// Test that the data transforms without modification
@@ -184,7 +187,7 @@ class DateTimeTest extends SnakeCase_PHPUnit_Framework_TestCase
 
 	public function test_ar_date_time_attribute_copies_exact_tz()
 	{
-		$dt = new DateTime(null, new \DateTimeZone('America/New_York'));
+		$dt = new DateTime("now", new \DateTimeZone('America/New_York'));
 		$model = $this->get_model();
 
 		// Test that the data transforms without modification

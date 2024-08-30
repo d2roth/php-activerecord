@@ -51,9 +51,9 @@ class CacheModelTest extends DatabaseTest
 		$publisher = Publisher::find(1);
 		$method = $this->set_method_public('Publisher', 'cache_key');
 		$cache_key = $method->invokeArgs($publisher, array());
-		$from_cache = Cache::$adapter->read($cache_key);
+		$publisherDirectlyFromCache = Cache::$adapter->read($cache_key);
 
-		$this->assertEquals($publisher->name, $from_cache->name);
+		$this->assertEquals($publisher->name, $publisherDirectlyFromCache->name);
 	}
 
 	public function test_model_cache_new()
@@ -71,6 +71,8 @@ class CacheModelTest extends DatabaseTest
 		$from_cache = Cache::$adapter->read($cache_key);
 
 		$this->assertEquals($actual, $from_cache);
+		$publisherDirectlyFromCache = Cache::$adapter->read($cache_key);
+		$this->assertEquals($publisher->name, $publisherDirectlyFromCache->name);
 	}
 
 	public function test_model_cache_find()
@@ -81,9 +83,9 @@ class CacheModelTest extends DatabaseTest
 		foreach($publishers as $publisher)
 		{
 			$cache_key = $method->invokeArgs($publisher, array());
-			$from_cache = Cache::$adapter->read($cache_key);
+			$publisherDirectlyFromCache = Cache::$adapter->read($cache_key);
 
-			$this->assertEquals($publisher->name, $from_cache->name);
+			$this->assertEquals($publisher->name, $publisherDirectlyFromCache->name);
 		}
 	}
 
@@ -115,8 +117,8 @@ class CacheModelTest extends DatabaseTest
 		$cache_key = $method->invokeArgs($publisher, array());
 		$this->assertEquals('Random House', $publisher->name);
 
-		$from_cache = Cache::$adapter->read($cache_key);
-		$this->assertEquals('Random House', $from_cache->name);
+		$publisherDirectlyFromCache = Cache::$adapter->read($cache_key);
+		$this->assertEquals('Random House', $publisherDirectlyFromCache->name);
 
 		// make sure that updates make it to cache
 		$publisher->name = 'Puppy Publishing';

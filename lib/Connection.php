@@ -67,7 +67,7 @@ abstract class Connection
 	 * Database's datetime format
 	 * @var string
 	 */
-	static $datetime_format = 'Y-m-d H:i:s';
+	static $datetime_format = 'Y-m-d H:i:s T';
 	/**
 	 * Default PDO options to set for each connection.
 	 * @var array
@@ -103,7 +103,7 @@ abstract class Connection
 	{
 		$config = Config::instance();
 
-		if (strpos($connection_string_or_connection_name, '://') === false)
+		if (!$connection_string_or_connection_name || strpos($connection_string_or_connection_name, '://') === false)
 		{
 			$connection_string = $connection_string_or_connection_name ?
 				$config->get_connection($connection_string_or_connection_name) :
@@ -490,7 +490,7 @@ abstract class Connection
 		$date = date_create($string);
 		$errors = \DateTime::getLastErrors();
 
-		if ($errors['warning_count'] > 0 || $errors['error_count'] > 0)
+		if ( $errors && ( $errors['warning_count'] > 0 || $errors['error_count'] > 0) )
 			return null;
 
 		$date_class = Config::instance()->get_date_class();

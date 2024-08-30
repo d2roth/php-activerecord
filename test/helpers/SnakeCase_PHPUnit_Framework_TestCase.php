@@ -1,5 +1,5 @@
 <?php
-class SnakeCase_PHPUnit_Framework_TestCase extends PHPUnit\Framework\TestCase
+class SnakeCase_PHPUnit_Framework_TestCase extends \PHPUnit\Framework\TestCase
 {
 	public function __call($meth, $args)
 	{
@@ -33,7 +33,7 @@ class SnakeCase_PHPUnit_Framework_TestCase extends PHPUnit\Framework\TestCase
 		return array($keys,$array);
 	}
 
-	public function assert_has_keys(/* $keys..., $array */): void
+	public function assert_has_keys(/* $keys..., $array */)
 	{
 		list($keys,$array) = $this->setup_assert_keys(func_get_args());
 
@@ -43,7 +43,7 @@ class SnakeCase_PHPUnit_Framework_TestCase extends PHPUnit\Framework\TestCase
 			$this->assert_array_has_key($name,$array);
 	}
 
-	public function assert_doesnt_has_keys(/* $keys..., $array */): void
+	public function assert_doesnt_has_keys(/* $keys..., $array */)
 	{
 		list($keys,$array) = $this->setup_assert_keys(func_get_args());
 
@@ -51,12 +51,12 @@ class SnakeCase_PHPUnit_Framework_TestCase extends PHPUnit\Framework\TestCase
 			$this->assert_array_not_has_key($name,$array);
 	}
 
-	public function assert_is_a($expected_class, $object): void
+	public function assert_is_a($expected_class, $object)
 	{
 		$this->assert_equals($expected_class,get_class($object));
 	}
 
-	public function assert_datetime_equals($expected, $actual): void
+	public function assert_datetime_equals($expected, $actual)
 	{
 		$this->assert_equals($expected->format(DateTime::ISO8601),$actual->format(DateTime::ISO8601));
 	}
